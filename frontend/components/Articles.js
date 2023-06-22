@@ -1,18 +1,20 @@
 import React, { useEffect } from 'react'
-import { Navigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import PT from 'prop-types'
 
 export default function Articles(props) {
   // ✨ where are my props? Destructure them here
-if(localStorage.getItem('token') === false){
-  Navigate('/')
-}
+  
 
   // ✨ implement conditional logic: if no token exists
   // we should render a Navigate to login screen (React Router v.6)
 
   useEffect(() => {
     // ✨ grab the articles here, on first render only
+    
+    
+     
+
     props.getArticles()
   }, [])
 
@@ -36,7 +38,7 @@ if(localStorage.getItem('token') === false){
                 </div>
                 <div>
                   <button disabled={false} onClick={(evt) => {evt.preventDefault(); console.log(art.article_id); props.setCurrentArticleId(art.article_id)}}>Edit</button>
-                  <button disabled={true} onClick={props.deleteArticle}>Delete</button>
+                  <button disabled={false} onClick={(evt) => {evt.preventDefault(); props.deleteArticle({article_id: art.article_id})}}>Delete</button>
                 </div>
               </div>
             )

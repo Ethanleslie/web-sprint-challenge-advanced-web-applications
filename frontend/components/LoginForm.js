@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PT from 'prop-types'
-
+import { useNavigate } from 'react-router-dom'
 
 
 
@@ -12,6 +12,19 @@ export default function LoginForm(props) {
   const [values, setValues] = useState(initialFormValues)
   const [disabled, setDisabled] = useState(true)
   // ✨ where are my props? Destructure them here
+
+//   // if(localStorage.getItem('token') === null){
+//     useNavigate('/')
+ 
+  
+// }
+
+  useEffect(() => {
+    
+    setDisabled(values.username.trim().length >=3 && values.password.trim().length >=8)
+  })
+
+
 
   const onChange = evt => {
     const { id, value } = evt.target
@@ -28,13 +41,7 @@ export default function LoginForm(props) {
     
   }
 
-  const isDisabled = () => {
-     // setDisabled(values.username.trim().length >=3 && values.password.trim().length >=8)
-    // ✨ implement
-    // Trimmed username must be >= 3, and
-    // trimmed password must be >= 8 for
-    // the button to become enabled
-  }
+  
 
   return (
     <form id="loginForm" onSubmit={onSubmit}>
@@ -53,7 +60,7 @@ export default function LoginForm(props) {
         placeholder="Enter password"
         id="password"
       />
-      <button disabled={isDisabled(!disabled)}  id="submitCredentials">Submit credentials</button>
+      <button disabled={(!disabled)}  id="submitCredentials">Submit credentials</button>
     </form>
   )
 }

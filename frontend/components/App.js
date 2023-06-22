@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { NavLink, Routes, Route, useNavigate } from "react-router-dom";
+import { NavLink, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import Articles from "./Articles";
 import LoginForm from "./LoginForm";
 import Message from "./Message";
 import ArticleForm from "./ArticleForm";
 import Spinner from "./Spinner";
 import axios from "axios";
+import PrivateRoute from "./PrivateRoute";
 
 const articlesUrl = "http://localhost:9000/api/articles";
 const loginUrl = "http://localhost:9000/api/login";
@@ -37,6 +38,7 @@ export default function App() {
     localStorage.removeItem("token");
     setMessage("Goodbye!");
     redirectToLogin();
+    setSpinnerOn(false)
   };
 
   const login = ({ username, password }) => {
@@ -92,6 +94,7 @@ export default function App() {
 
   const postArticle = (article) => {
     const token = localStorage.getItem("token");
+    console.log(article)
     setSpinnerOn(true);
     axios
       .post(`${articlesUrl}`, article, {
@@ -102,7 +105,9 @@ export default function App() {
       .then((res) => {
         console.log(res);
         setMessage(res.data.message);
-        setArticles(res.data);
+        setArticles(articles => {
+          return articles.concat(res.data.article)
+        });
         setSpinnerOn(false);
       })
       .catch((err) => {
@@ -129,16 +134,19 @@ export default function App() {
         }
       )
       .then((res) => {
+        
         console.log(res.data)
         setArticles((prevArt) => {
           console.log('1', prevArt)
-          prevArt.map(art => {
+         return prevArt.map(art => {
             console.log('2', res.data.article)
             return art.article_id === article_id ? res.data.article : art
            })
         }
         );
-      })
+        setCurrentArticleId(null)
+        setMessage(res.data.message)
+      })  
       .catch((err) => {
         console.log(err);
       });
@@ -150,18 +158,32 @@ export default function App() {
   const deleteArticle = (article_id) => {
     // ✨ implement
     const token = localStorage.getItem("token");
+    console.log(article_id)
+    
 
-    axios.delete(`http://localhost:9000/api/articles/:article_id`, article_id, {
+    axios.delete(`http://localhost:9000/api/articles/${article_id.article_id}`, {
       headers: {
         authorization: token,
-      }.then((res) => {
-        console.log(res);
-      }),
+      }
+      
+    })
+    .then((res) => {
+      console.log(articles)
+      console.log(res.data)
+      setMessage(res.data.message)
+      setArticles(articles => {
+        return articles.filter(art => {
+          return art.article_id != article_id.article_id
+        })
+      })
     })
     .catch((err) => {
       console.log(err)
-    });
-  };
+    })
+  }
+
+  
+
 
 
 
@@ -186,11 +208,11 @@ export default function App() {
           </NavLink>
         </nav>
         <Routes>
-          <Route path="/" element={<LoginForm login={login} />} />
+          <Route path="/" element={<LoginForm login={login} setSpinnerOn={setSpinnerOn}/>} />
           <Route
             path="articles"
-            element={
-              <>
+            element={<PrivateRoute> 
+              
                 <ArticleForm
                   postArticle={postArticle}
                   updateArticle={updateArticle}
@@ -206,11 +228,14 @@ export default function App() {
                   deleteArticle={deleteArticle}
                   setCurrentArticleId={setCurrentArticleId}
                   currentArticleId={currentArticleId}
+                  setSpinnerOn={setSpinnerOn}
                   
                 />
-              </>
+              
+              </PrivateRoute>
             }
           />
+          
         </Routes>
         <footer>Bloom Institute of Technology 2022</footer>
       </div>

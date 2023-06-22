@@ -7,7 +7,7 @@ export default function ArticleForm(props) {
   const [values, setValues] = useState(initialFormValues)
   
   // ✨ where are my props? Destructure them here
-  const { currentArticle, postArticle, updateArticle, setCurrentArticleId } = props
+  const { currentArticle, postArticle, updateArticle,  } = props
   console.log(currentArticle)
   useEffect(() => {
     // ✨ implement
@@ -32,21 +32,22 @@ export default function ArticleForm(props) {
     const { id, value } = evt.target
     setValues({ ...values, [id]: value })
   }
-
+  
   const onSubmit = evt => {
     evt.preventDefault()
-    postArticle({
-      title: values.title,
-      text: values.text,
-      topic: values.topic
-    })
+    postArticle(values)
+    setValues(
+      initialFormValues
+    )
     // ✨ implement
     // We must submit a new post or update an existing one,
     // depending on the truthyness of the `currentArticle` prop.
   }
 
   const isDisabled = () => {
-    
+    if(values.title.trim().length > 1 && values.text.trim().length > 1 && values.topic !== null)
+    return false
+    else{ return true}
     // ✨ implement
     // Make sure the inputs have some values
   }
@@ -55,7 +56,7 @@ export default function ArticleForm(props) {
   return (
     // ✨ fix the JSX: make the heading display either "Edit" or "Create"
     // and replace Function.prototype with the correct function
-    <form id="form" onSubmit={onSubmit}>
+    <form id="form" >
       <h2>{ props.currentArticleId === null ? 'Create Article' : 'Edit Article'}</h2>
       <input
         maxLength={50}
@@ -77,10 +78,11 @@ export default function ArticleForm(props) {
         <option value="React">React</option>
         <option value="Node">Node</option>
       </select>
-      <div className="button-group">
-        <button disabled={isDisabled()} id="submitArticle" onClick={(evt) => {evt.preventDefault(); updateArticle({article_id: props.currentArticleId, article: values})}}>Submit</button>
-        <button >Cancel edit</button>
-      </div>
+          {props.currentArticleId === null ? <button disabled={isDisabled(!true)} onClick={(evt) => {evt.preventDefault(); setValues(initialFormValues); postArticle({title: values.title, text: values.text, topic: values.topic})}}>Submit</button> : 
+           <div className="button-group"> <button  id="submitArticle" onClick={(evt) => {evt.preventDefault(); setValues(initialFormValues); updateArticle({article_id: props.currentArticleId, article: values})}}>Submit</button> 
+           <button onClick={() => setValues(initialFormValues)}>Cancel edit</button></div>}
+      
+      
     </form>
   )
 }
