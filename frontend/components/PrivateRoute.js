@@ -1,7 +1,6 @@
 import React from 'react'
 import { Route, useNavigate} from 'react-router-dom'
-
-
+import LoginForm from './LoginForm'
 
 const PrivateRoute = ({children}) => {
     const navigate = useNavigate()
@@ -9,7 +8,7 @@ const PrivateRoute = ({children}) => {
     if(getToken !== null) {
         return (children)
     }else {
-        return navigate("/")
+        return <LoginForm/>
         
     }
 }
